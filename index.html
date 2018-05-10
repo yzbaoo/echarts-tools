@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+        crossorigin="anonymous">
+    <link id="toggleCss" type="text/css" rel="stylesheet" href="./css/index.css">
+
+</head>
+
+<body>
+    <div class="container">
+        图类型：
+        <select class="echart-select">
+            <option value=null>请选择</option>
+            <option value="0">柱形图</option>
+            <option value="1">饼图</option>
+        </select>
+        <div>
+            标题：<input type="text" class="echart-title">(可不填)
+        </div>
+        <div class="echart-input">
+            <div class="echart-item">
+                文字:
+                <input type="text" name="" class="echart-x-txt" /> 值:
+                <input type="text" name="" class="echart-y-num" />
+                <a class="echart-btn-remove">移除</a>
+            </div>
+        </div>
+        <a class="echart-btn-add">添加 +</a>
+        <br/>
+        <a class="echart-submit">生成图表</a>
+        <div id="echarts">
+            <div id="main" style="width: 900px;height:600px;"></div>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/echarts/4.0.4/echarts-en.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+        crossorigin="anonymous"></script>
+    <script>
+
+
+        $('.echart-btn-add').click(function () {
+            var temp = `<div>文字: <input type="text" name="" class="echart-x-txt" /> 值:<input type="text" name="" class="echart-y-num" /> <a class="echart-btn-remove">移除</a></div>`;
+            $('.echart-input').append(temp);
+        });
+        $('.echart-submit').click(function () {
+            var inputTxt = $(".echart-x-txt");
+            var inputNum = $(".echart-y-num");
+            var inputTit = $(".echart-title").val();
+            var dataX = [];
+            var dataY = [];
+            for (var i = 0; i < inputTxt.length; i++) {
+                dataX.push($(inputTxt[i]).val());
+            }
+            for (var i = 0; i < inputNum.length; i++) {
+                dataY.push($(inputNum[i]).val());
+            }
+            var selectVal = $('.echart-select').find("option:selected").val();
+            if (selectVal == 'null') {
+                alert("请选择输出图的类型");
+            } else {
+                if (selectVal == 0) {//柱
+                    jQuery.getScript("./js/bar.js", function (data, status, jqxhr) {
+                        option.xAxis.data = dataX;
+                        option.series[0].data = dataY;
+                        option.title.text = inputTit;
+                        myChart.clear();
+                        myChart.setOption(option);
+                    });
+                } else if (selectVal == 1) {//饼
+                    jQuery.getScript("./js/pie.js", function (data, status, jqxhr) {
+                        var data = [];
+                        for(var i = 0;i<dataX.length;i++){
+                            var obj = {};
+                            obj.name = dataX[i];
+                            obj.value = dataY[i]-0;
+                            data[i]=obj;
+                        }
+                        option.series[0].data = data;
+                        option.title.text = inputTit;
+                        myChart.clear();
+                        myChart.setOption(option);
+                    });
+                }
+
+            }
+        });
+        $('.echart-select').change(function () {
+            var selectVal = $('.echart-select').find("option:selected").val();
+            console.log("selectVal:", selectVal);
+
+        });
+        $('.echart-btn-remove').click(function(e){
+            console.log($(e.target));
+            $(e.target).parent('.echart-item').remove();
+        });
+    </script>
+</body>
+
+</html>
